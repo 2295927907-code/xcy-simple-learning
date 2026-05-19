@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*.log
+SPD_startup_log.txt
+node_modules/
+.npm-cache/
+.DS_Store
+Thumbs.db
+
+# Local measurement/test data and generated exports
+2025年12月参数包/
+珠峰光谱4、7、10、12/
+AM0/
+video_spd_intro/
+*.inp
+*结果.xlsx
+光谱相关数据.xlsx
+AM0数据.xlsx
+am0 120-4000 astm e490.xlsx
+IEC 60904-4.pdf
+使用要求.png
