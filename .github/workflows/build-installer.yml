@@ -1,0 +1,49 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-installer:
+    name: Build and publish Setup.exe
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Inno Setup
+        shell: powershell
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: powershell
+        run: |
+          [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+          $OutputEncoding = [Console]::OutputEncoding
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\安装包\build_installer.ps1
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 光谱匹配分析器_Setup
+          path: 安装包/输出/光谱匹配分析器_Setup.exe
+          if-no-files-found: error
+
+      - name: Publish release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "installer-${{ github.run_number }}"
+          $installer = ".\安装包\输出\光谱匹配分析器_Setup.exe"
+          $notes = "只需下载附件 ``光谱匹配分析器_Setup.exe`` 并双击运行即可安装使用；不需要另外安装 Python、依赖包或单独下载光谱默认数据。"
+          gh release create $tag "$installer#光谱匹配分析器_Setup.exe" --target main --title "光谱匹配分析器 Setup ${{ github.run_number }}" --notes $notes
